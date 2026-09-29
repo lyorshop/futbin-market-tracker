@@ -1,0 +1,21 @@
+{
+  "_note": "Comptes et sites suivis par la veille. type : 'reddit' (automatique), 'rss' (automatique, mettre l'adresse du flux dans 'flux'), 'x' ou 'youtube' (automatique seulement si 'flux' est rempli, voir le README). Mettre 'actif' à false pour ignorer une source.",
+  "sources": [
+    {"nom": "r/EASportsFC", "type": "reddit", "sub": "EASportsFC", "actif": true},
+    {"nom": "r/fut", "type": "reddit", "sub": "fut", "actif": true},
+    {"nom": "FUT Sheriff (fuites)", "type": "x", "compte": "FutSheriff", "flux": "", "actif": true},
+    {"nom": "FUTBIN", "type": "x", "compte": "FUTBIN", "flux": "", "actif": true},
+    {"nom": "EA SPORTS FC", "type": "x", "compte": "EASPORTSFC", "flux": "", "actif": true},
+    {"nom": "EA FC Direct", "type": "x", "compte": "EAFCDirect", "flux": "", "actif": true}
+  ],
+  "mots_cles": {
+    "fuite": ["leak", "leaked", "fuite", "coming soon", "confirmed", "upcoming", "teaser", "loading screen"],
+    "promo": ["promo", "toty", "tots", "futties", "black friday", "fut birthday", "thunderstruck", "centurions", "trailblazers", "team 1", "team 2", "team 3"],
+    "pack": ["pack", "store", "lightning round", "pack drop", "player pick", "tradeable"],
+    "sbc": ["sbc", "fodder", "fourrage", "84+", "85+", "86+", "87+", "upgrade"],
+    "esport": ["esport", "fc pro", "echampions", "world championship", "road to the final", "rttf", "rttk", "dynamic"],
+    "crash": ["crash", "crashing", "dump", "sell off", "sell now", "drop", "baisse"],
+    "hausse": ["invest", "rising", "going up", "hausse", "price rise", "spike", "buy now"]
+  },
+  "poids": {"fuite": 3, "promo": 2, "pack": 2, "sbc": 1, "esport": 2, "crash": 3, "hausse": 3}
+}

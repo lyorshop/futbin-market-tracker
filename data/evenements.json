@@ -1,0 +1,33 @@
+{
+  "_note": "Dates approximatives des saisons passées, à corriger au fil de l'eau. 'effet' : crash, hausse ou volatil. Les prévisions de la saison en cours sont calculées à partir de ces dates.",
+  "hebdomadaire": [
+    {"jour": 0, "heure": "08:00", "nom": "Récompenses Champions", "effet": "crash", "detail": "Beaucoup de packs ouverts : fourrage et cartes moyennes baissent. Bon moment pour acheter."},
+    {"jour": 3, "heure": "09:00", "nom": "Récompenses Rivals", "effet": "crash", "detail": "Afflux de cartes le jeudi : prix bas le jeudi et vendredi matin."},
+    {"jour": 4, "heure": "19:00", "nom": "Nouvelle promo (vendredi 19h)", "effet": "crash", "detail": "Les joueurs vendent pour ouvrir des packs : baisse générale. Le plus bas de la semaine est souvent vendredi 18h-21h."},
+    {"jour": 5, "heure": "10:00", "nom": "Weekend League / Champions", "effet": "hausse", "detail": "Les méta-cartes montent le samedi et le dimanche. Moment pour revendre."},
+    {"jour": 6, "heure": "18:00", "nom": "Fin de week-end", "effet": "hausse", "detail": "Pic fréquent des méta-cartes dimanche après-midi."}
+  ],
+  "annuel": [
+    {"nom": "Accès anticipé", "effet": "crash", "saison": 24, "debut": "2023-09-22", "fin": "2023-09-28", "detail": "Prix très hauts puis chute continue pendant des semaines."},
+    {"nom": "Sortie officielle", "effet": "crash", "saison": 24, "debut": "2023-09-29", "fin": "2023-10-06", "detail": "Deuxième vague de joueurs : l'offre explose."},
+    {"nom": "Black Friday", "effet": "crash", "saison": 24, "debut": "2023-11-24", "fin": "2023-11-27", "detail": "Ventes paniques avant, promos flash et packs en boucle."},
+    {"nom": "TOTY", "effet": "crash", "saison": 24, "debut": "2024-01-12", "fin": "2024-01-26", "detail": "Le plus gros crash de l'année juste avant et pendant le TOTY, puis remontée."},
+    {"nom": "TOTS", "effet": "crash", "saison": 24, "debut": "2024-04-26", "fin": "2024-06-14", "detail": "Cartes très puissantes : les anciennes cartes perdent de la valeur."},
+    {"nom": "Futties", "effet": "crash", "saison": 24, "debut": "2024-06-21", "fin": "2024-08-02", "detail": "Fin de jeu : marché en déclin."},
+
+    {"nom": "Accès anticipé", "effet": "crash", "saison": 25, "debut": "2024-09-20", "fin": "2024-09-26", "detail": "Prix très hauts puis chute continue pendant des semaines."},
+    {"nom": "Sortie officielle", "effet": "crash", "saison": 25, "debut": "2024-09-27", "fin": "2024-10-04", "detail": "Deuxième vague de joueurs : l'offre explose."},
+    {"nom": "Black Friday", "effet": "crash", "saison": 25, "debut": "2024-11-29", "fin": "2024-12-02", "detail": "Ventes paniques avant, promos flash et packs en boucle."},
+    {"nom": "TOTY", "effet": "crash", "saison": 25, "debut": "2025-01-17", "fin": "2025-01-31", "detail": "Le plus gros crash de l'année juste avant et pendant le TOTY, puis remontée."},
+    {"nom": "TOTS", "effet": "crash", "saison": 25, "debut": "2025-04-25", "fin": "2025-06-13", "detail": "Cartes très puissantes : les anciennes cartes perdent de la valeur."},
+    {"nom": "Futties", "effet": "crash", "saison": 25, "debut": "2025-06-20", "fin": "2025-08-01", "detail": "Fin de jeu : marché en déclin."},
+
+    {"nom": "Accès anticipé", "effet": "crash", "saison": 26, "debut": "2025-09-19", "fin": "2025-09-25", "detail": "Prix très hauts puis chute continue pendant des semaines."},
+    {"nom": "Sortie officielle", "effet": "crash", "saison": 26, "debut": "2025-09-26", "fin": "2025-10-03", "detail": "Deuxième vague de joueurs : l'offre explose."},
+    {"nom": "Black Friday", "effet": "crash", "saison": 26, "debut": "2025-11-28", "fin": "2025-12-01", "detail": "Ventes paniques avant, promos flash et packs en boucle."},
+    {"nom": "TOTY", "effet": "crash", "saison": 26, "debut": "2026-01-16", "fin": "2026-01-30", "detail": "Le plus gros crash de l'année juste avant et pendant le TOTY, puis remontée."},
+    {"nom": "TOTS", "effet": "crash", "saison": 26, "debut": "2026-04-24", "fin": "2026-06-12", "detail": "Cartes très puissantes : les anciennes cartes perdent de la valeur."},
+    {"nom": "Futties", "effet": "crash", "saison": 26, "debut": "2026-06-19", "fin": "2026-07-31", "detail": "Fin de jeu : marché en déclin."}
+  ],
+  "manuel": []
+}

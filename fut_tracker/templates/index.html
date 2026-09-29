@@ -1,0 +1,90 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Marché FUT</title>
+<link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+<script src="{{ url_for('static', filename='chart.umd.js') }}"></script>
+</head>
+<body>
+<header>
+  <h1>Marché FUT <span class="muted">· EA FC {{ annee }} · {{ plateforme }}</span></h1>
+  <div id="etat" class="muted"></div>
+</header>
+
+<nav>
+  <button data-tab="signaux" class="actif">Signaux</button>
+  <button data-tab="populaires">Plus utilisés</button>
+  <button data-tab="calendrier">Calendrier</button>
+  <button data-tab="veille">Veille</button>
+</nav>
+
+<main>
+<section id="signaux" class="onglet actif">
+  <div class="barre">
+    <form id="form-joueur">
+      <input name="futbin_id" placeholder="Lien ou n° FUTBIN du joueur" required>
+      <input name="nom" placeholder="Nom (facultatif)">
+      <button>Suivre</button>
+    </form>
+    <button id="btn-collecter">Relever les prix maintenant</button>
+  </div>
+  <div id="contexte"></div>
+  <table>
+    <thead><tr><th>Joueur</th><th>Prix</th><th>24 h</th><th>7 j</th><th>Fourchette 30 j</th><th>Avis</th><th></th></tr></thead>
+    <tbody id="liste-joueurs"></tbody>
+  </table>
+  <div id="detail" hidden>
+    <h2 id="detail-nom"></h2>
+    <div class="graph"><canvas id="graph"></canvas></div>
+    <div id="detail-raisons"></div>
+    <div id="detail-profil"></div>
+    <div class="barre">
+      <form id="form-prix"><input name="prix" placeholder="Prix vu dans le jeu (ex. 12 500)" required><button>Ajouter ce prix</button></form>
+      <form id="form-histo"><button>Importer l'historique FUTBIN</button></form>
+    </div>
+  </div>
+</section>
+
+<section id="populaires" class="onglet">
+  <div class="barre">
+    <button id="btn-pop-maj">Actualiser depuis FUTBIN</button>
+    <button id="btn-pop-suivre">Suivre le top 20</button>
+    <span id="pop-date" class="muted"></span>
+  </div>
+  <div class="colonnes">
+    <div><h2>En ce moment</h2><ol id="pop-liste"></ol></div>
+    <div><h2>Les plus réguliers</h2><p class="muted">Présents le plus souvent dans le top depuis le début du suivi : les vraies méta-cartes.</p>
+      <table><thead><tr><th>Joueur</th><th>Relevés</th><th>Rang moyen</th></tr></thead><tbody id="pop-reguliers"></tbody></table></div>
+  </div>
+</section>
+
+<section id="calendrier" class="onglet">
+  <div class="colonnes">
+    <div><h2>À venir</h2><ul id="cal-avenir" class="cartes"></ul></div>
+    <div><h2>Cycles de la semaine</h2><ul id="cal-semaine" class="cartes"></ul></div>
+  </div>
+  <h2>Ajouter un événement (fuite, annonce…)</h2>
+  <form id="form-evt" class="barre">
+    <input name="nom" placeholder="Nom (ex. Promo eSport)" required>
+    <input name="debut" type="date" required><input name="fin" type="date">
+    <select name="effet"><option value="crash">Baisse attendue</option><option value="hausse">Hausse attendue</option><option value="volatil">Instable</option></select>
+    <button>Ajouter</button>
+  </form>
+  <h2>Saisons précédentes</h2>
+  <table><thead><tr><th>Saison</th><th>Événement</th><th>Dates</th><th>Effet</th><th>Ce qui se passe</th></tr></thead><tbody id="cal-histo"></tbody></table>
+</section>
+
+<section id="veille" class="onglet">
+  <div class="barre">
+    <button id="btn-veille-maj">Actualiser</button>
+    <label><input type="checkbox" id="veille-importants"> Seulement les plus importants</label>
+  </div>
+  <ul id="veille-liste" class="flux"></ul>
+</section>
+</main>
+<script>window.ANNEE = "{{ annee }}";</script>
+<script src="{{ url_for('static', filename='app.js') }}"></script>
+</body>
+</html>
