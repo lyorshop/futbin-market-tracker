@@ -27,6 +27,14 @@ CREATE TABLE IF NOT EXISTS populaires (
     rang INTEGER NOT NULL,
     releve_le TEXT NOT NULL
 );
+CREATE TABLE IF NOT EXISTS pages (
+    futbin_id INTEGER PRIMARY KEY,
+    chemin TEXT NOT NULL
+);
+CREATE TABLE IF NOT EXISTS images (
+    futbin_id INTEGER PRIMARY KEY,
+    url TEXT NOT NULL
+);
 CREATE TABLE IF NOT EXISTS publications (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     source TEXT NOT NULL,
@@ -104,6 +112,29 @@ def save_popular(conn, players):
         "INSERT INTO populaires (futbin_id, nom, rang, releve_le) VALUES (?, ?, ?, ?)",
         [(p["futbin_id"], p["nom"], i + 1, ts) for i, p in enumerate(players)],
     )
+    for p in players:
+        save_image_url(conn, p["futbin_id"], p.get("image"))
+        save_page(conn, p["futbin_id"], p.get("chemin"))
+
+
+def save_image_url(conn, futbin_id, url):
+    if url:
+        conn.execute("INSERT OR REPLACE INTO images (futbin_id, url) VALUES (?, ?)", (int(futbin_id), url))
+
+
+def save_page(conn, futbin_id, chemin):
+    if chemin:
+        conn.execute("INSERT OR REPLACE INTO pages (futbin_id, chemin) VALUES (?, ?)", (int(futbin_id), chemin))
+
+
+def get_page(conn, futbin_id):
+    row = conn.execute("SELECT chemin FROM pages WHERE futbin_id = ?", (int(futbin_id),)).fetchone()
+    return row["chemin"] if row else None
+
+
+def get_image_url(conn, futbin_id):
+    row = conn.execute("SELECT url FROM images WHERE futbin_id = ?", (int(futbin_id),)).fetchone()
+    return row["url"] if row else None
 
 
 def latest_popular(conn):

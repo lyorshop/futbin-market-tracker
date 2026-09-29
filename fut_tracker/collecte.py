@@ -19,10 +19,14 @@ def collect_prices(conn, platform=None):
     ok, errors = 0, []
     for p in db.list_players(conn):
         try:
-            db.add_price(conn, p["id"], platform, futbin.fetch_price(p["futbin_id"], platform))
+            price = futbin.fetch_price(p["futbin_id"], platform, chemin=db.get_page(conn, p["futbin_id"]))
+            db.add_price(conn, p["id"], platform, price)
             ok += 1
         except futbin.FutbinError as exc:
             errors.append(f"{p['nom']} : {exc}")
+    for futbin_id, url in futbin.images_vues.items():
+        if url and not db.get_image_url(conn, futbin_id):
+            db.save_image_url(conn, futbin_id, url)
     conn.commit()
     _note("prix", errors=errors)
     return {"releves": ok, "erreurs": errors}

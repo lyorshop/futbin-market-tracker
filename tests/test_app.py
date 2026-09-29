@@ -41,3 +41,25 @@ def test_collect_errors_are_reported(client, monkeypatch):
 def test_calendar_endpoint(client):
     d = client.get("/api/calendrier").json
     assert d["hebdomadaire"] and d["historique"]
+
+
+def test_price_collect_uses_saved_player_path(client, monkeypatch):
+    client.post("/api/joueurs", json={"futbin_id": "https://www.futbin.com/27/player/6/aitana-bonmati"})
+    seen = {}
+
+    def fake_fetch(futbin_id, platform=None, year=None, chemin=None):
+        seen["chemin"] = chemin
+        return 15000
+    monkeypatch.setattr(futbin, "fetch_price", fake_fetch)
+    assert client.post("/api/collecter").json["releves"] == 1
+    assert seen["chemin"] == "/27/player/6/aitana-bonmati"
+
+
+def test_card_image_is_cached(client, monkeypatch, tmp_path):
+    monkeypatch.setattr(app_module, "CARDS_DIR", tmp_path / "cartes")
+    calls = []
+    monkeypatch.setattr(futbin, "fetch_image_url", lambda fid, year=None, chemin=None: "https://cdn/x.png")
+    monkeypatch.setattr(futbin, "download_image", lambda url: calls.append(url) or (b"\x89PNG", "image/png"))
+    assert client.get("/api/image/6").status_code == 200
+    assert client.get("/api/image/6").data == b"\x89PNG"
+    assert len(calls) == 1

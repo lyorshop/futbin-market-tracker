@@ -1,7 +1,8 @@
 import argparse
+import time
 from datetime import date
 
-from flask import Flask, g, jsonify, render_template, request
+from flask import Flask, g, jsonify, render_template, request, send_file
 
 from . import analyse, calendrier, collecte, config, db, futbin
 
@@ -58,6 +59,8 @@ def api_add_joueur():
         return jsonify({"erreur": "Identifiant ou lien FUTBIN invalide"}), 400
     conn = _conn()
     row = db.add_player(conn, int(futbin_id), nom.strip())
+    if m:
+        db.save_page(conn, futbin_id, m.group(0))
     conn.commit()
     return jsonify(dict(row)), 201
 
@@ -101,6 +104,50 @@ def api_historique(joueur_id):
 @app.post("/api/collecter")
 def api_collecter():
     return jsonify(collecte.run_locked(collecte.collect_prices))
+
+
+CARDS_DIR = config.DATA_DIR / "cartes"
+EXT = {"image/png": ".png", "image/webp": ".webp", "image/jpeg": ".jpg", "image/gif": ".gif"}
+_image_failures = {}  # futbin_id -> heure du dernier échec, pour ne pas réessayer à chaque affichage
+
+
+@app.get("/api/image/<int:futbin_id>")
+def api_image(futbin_id):
+    """Image de la carte, téléchargée une seule fois puis gardée dans data/cartes."""
+    cached = next(CARDS_DIR.glob(f"{futbin_id}.*"), None) if CARDS_DIR.exists() else None
+    if cached:
+        return send_file(cached, max_age=7 * 86400)
+    if time.time() - _image_failures.get(futbin_id, 0) < 3600:
+        return "", 404
+    try:
+        url = db.get_image_url(_conn(), futbin_id)
+        if not url:
+            url = futbin.fetch_image_url(futbin_id, chemin=db.get_page(_conn(), futbin_id))
+            if not url:
+                raise futbin.FutbinError("pas d'image sur la page")
+            db.save_image_url(_conn(), futbin_id, url)
+            _conn().commit()
+        content, ctype = futbin.download_image(url)
+    except futbin.FutbinError:
+        _image_failures[futbin_id] = time.time()
+        return "", 404
+    CARDS_DIR.mkdir(parents=True, exist_ok=True)
+    path = CARDS_DIR / f"{futbin_id}{EXT.get(ctype, '.img')}"
+    path.write_bytes(content)
+    return send_file(path, mimetype=ctype, max_age=7 * 86400)
+
+
+@app.get("/api/diagnostic")
+def api_diagnostic():
+    futbin_id = request.args.get("futbin_id")
+    if not futbin_id:
+        players = db.list_players(_conn())
+        if not players:
+            return "Suis au moins un joueur avant de lancer le diagnostic.", 400
+        futbin_id = players[0]["futbin_id"]
+    report = futbin.diagnostic(int(futbin_id), chemin=db.get_page(_conn(), futbin_id))
+    return report, 200, {"Content-Type": "text/plain; charset=utf-8",
+                         "Content-Disposition": "attachment; filename=diagnostic-futbin.txt"}
 
 
 @app.get("/api/populaires")

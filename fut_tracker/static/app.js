@@ -4,6 +4,7 @@ const esc = (s) => String(s ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "
 const pct = (v) => (v == null ? "–" : `<span class="${v >= 0 ? "up" : "down"}">${v > 0 ? "+" : ""}${v} %</span>`);
 const dateFr = (iso) => (iso ? new Date(iso).toLocaleString("fr-FR", { dateStyle: "short", timeStyle: "short" }) : "");
 const jourFr = (iso) => new Date(iso + "T12:00").toLocaleDateString("fr-FR", { weekday: "short", day: "numeric", month: "short", year: "numeric" });
+const carte = (id, cls = "carte") => `<img class="${cls}" src="/api/image/${id}" alt="" loading="lazy" onerror="this.classList.add('vide')">`;
 const EFFET = { crash: "Baisse", hausse: "Hausse", volatil: "Instable" };
 
 async function api(url, opts = {}) {
@@ -43,7 +44,7 @@ async function loadJoueurs() {
   $("#liste-joueurs").innerHTML = joueurs.length ? joueurs.map((j) => {
     const s = j.stats, a = j.signal.avis, cls = a.includes("cheter") ? "acheter" : a.includes("endre") ? "vendre" : "attendre";
     return `<tr data-id="${j.id}">
-      <td><b>${esc(j.nom)}</b><br><span class="muted">${j.origine === "populaire" ? "top utilisés" : "ajouté"} · <a href="https://www.futbin.com/${window.ANNEE}/player/${j.futbin_id}" target="_blank" rel="noopener">FUTBIN</a></span></td>
+      <td><div class="avec-carte">${carte(j.futbin_id)}<div><b>${esc(j.nom)}</b><br><span class="muted">${j.origine === "populaire" ? "top utilisés" : "ajouté"} · <a href="https://www.futbin.com/${window.ANNEE}/player/${j.futbin_id}" target="_blank" rel="noopener">FUTBIN</a></span></div></div></td>
       <td class="num">${s ? fmt(s.dernier) : "–"}</td><td class="num">${s ? pct(s.var_24h) : "–"}</td><td class="num">${s ? pct(s.var_7j) : "–"}</td>
       <td>${s ? `${fmt(s.min_30j)} – ${fmt(s.max_30j)}<div class="jauge"><i style="left:calc(${s.position_30j}% - 2px)"></i></div>` : "–"}</td>
       <td><span class="avis ${cls}">${esc(a)}</span></td>
@@ -65,7 +66,7 @@ async function showDetail(id) {
   const j = window._joueurs.find((x) => x.id === id);
   const d = await api(`/api/joueurs/${id}/prix`);
   $("#detail").hidden = false;
-  $("#detail-nom").textContent = j.nom;
+  $("#detail-nom").innerHTML = `${carte(j.futbin_id, "carte grande")}<span>${esc(j.nom)}</span>`;
   $("#detail-raisons").innerHTML = j.signal.raisons.length
     ? `<ul>${j.signal.raisons.map((r) => `<li>${esc(r)}</li>`).join("")}</ul>` : `<p class="muted">${esc(j.signal.avis)}</p>`;
   const p = d.profil;
@@ -110,12 +111,30 @@ $("#form-histo").addEventListener("submit", (ev) => {
 });
 
 // Plus utilisés
+// Un même joueur peut avoir plusieurs cartes (base, promo…) : on les numérote pour les distinguer.
+function nommer(liste) {
+  const total = {}, vus = {};
+  liste.forEach((p) => { total[p.nom] = (total[p.nom] || 0) + 1; });
+  return liste.map((p) => {
+    if (total[p.nom] < 2) return { ...p, libelle: p.nom };
+    vus[p.nom] = (vus[p.nom] || 0) + 1;
+    return { ...p, libelle: `${p.nom} (carte ${vus[p.nom]})` };
+  });
+}
+const lienCarte = (p) => `<a href="https://www.futbin.com/${window.ANNEE}/player/${p.futbin_id}" target="_blank" rel="noopener">${esc(p.libelle)}</a>`;
+$("#pop-liste").addEventListener("click", async (ev) => {
+  const b = ev.target.closest("[data-suivre]");
+  if (!b) return;
+  try { await api("/api/joueurs", { method: "POST", body: { futbin_id: b.dataset.suivre, nom: b.dataset.nom } }); loadPopulaires(); }
+  catch (e) { alert(e.message); }
+});
 async function loadPopulaires() {
   const d = await api("/api/populaires");
   $("#pop-date").textContent = d.releve_le ? `Relevé du ${dateFr(d.releve_le)}` : "Jamais relevé";
-  $("#pop-liste").innerHTML = d.joueurs.map((p) => `<li>${esc(p.nom)} ${p.suivi ? '<span class="tag">suivi</span>' : ""}</li>`).join("")
+  $("#pop-liste").innerHTML = nommer(d.joueurs).map((p) => `<li>${carte(p.futbin_id, "carte mini")}${lienCarte(p)}
+    ${p.suivi ? '<span class="tag">suivi</span>' : `<button class="lien" data-suivre="${p.futbin_id}" data-nom="${esc(p.nom)}">+ suivre</button>`}</li>`).join("")
     || `<p class="muted">Clique sur « Actualiser depuis FUTBIN ».</p>`;
-  $("#pop-reguliers").innerHTML = d.reguliers.map((p) => `<tr><td>${esc(p.nom)}</td><td class="num">${p.apparitions}</td><td class="num">${p.rang_moyen}</td></tr>`).join("");
+  $("#pop-reguliers").innerHTML = nommer(d.reguliers).map((p) => `<tr><td>${lienCarte(p)}</td><td class="num">${p.apparitions}</td><td class="num">${p.rang_moyen}</td></tr>`).join("");
 }
 $("#btn-pop-maj").addEventListener("click", (ev) => busy(ev.target, async () => {
   const r = await api("/api/populaires/actualiser", { method: "POST" });

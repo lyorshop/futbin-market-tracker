@@ -42,3 +42,10 @@ tbody tr { cursor: default; } #liste-joueurs tr { cursor: pointer; } #liste-joue
 ol#pop-liste { background: var(--panel); border: 1px solid var(--line); border-radius: 8px; padding: 10px 10px 10px 40px; margin: 0; }
 ol#pop-liste li { padding: 3px 0; }
 a { color: var(--accent); }
+.carte { width: 44px; height: 56px; object-fit: contain; flex: none; }
+.carte.mini { width: 30px; height: 38px; vertical-align: middle; margin-right: 8px; }
+.carte.grande { width: 120px; height: 160px; }
+.carte.vide { visibility: hidden; }
+.avec-carte { display: flex; gap: 10px; align-items: center; }
+#detail-nom { display: flex; gap: 16px; align-items: center; }
+.carte.grande.vide { display: none; }

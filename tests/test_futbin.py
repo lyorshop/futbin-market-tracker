@@ -35,4 +35,38 @@ def test_parse_player_links():
               <a href="/27/player/200/vini-jr"><img src="x.png"></a>
               <a href="/26/player/300/ancienne-carte">Ancienne</a>"""
     players = futbin.parse_player_links(html, year=27)
-    assert players == [{"futbin_id": 100, "nom": "Mbappé"}, {"futbin_id": 200, "nom": "Vini Jr"}]
+    assert [(p["futbin_id"], p["nom"]) for p in players] == [(100, "Mbappé"), (200, "Vini Jr")]
+    assert players[0]["chemin"] == "/27/player/100/kylian-mbappe"
+    assert players[1]["image"] == "https://www.futbin.com/x.png"
+
+
+def test_player_url_uses_known_path():
+    assert futbin.player_url(6, "/27/player/6/aitana-bonmati") == "https://www.futbin.com/27/player/6/aitana-bonmati"
+    assert futbin.player_url(6, year="27") == "https://www.futbin.com/27/player/6"
+
+
+def test_parse_card_image():
+    html = '<meta property="og:image" content="https://cdn.futbin.com/cards/6.png">'
+    assert futbin.parse_card_image(html) == "https://cdn.futbin.com/cards/6.png"
+    html = '<img class="player-card-img" src="/content/players/6.png">'
+    assert futbin.parse_card_image(html) == "https://www.futbin.com/content/players/6.png"
+
+
+def test_parse_price_html_ignores_price_range():
+    html = """<div class="price-range">PR: 10,000 - 200,000</div>
+              <div class="player-price-box"><span class="price-value">48.5K</span></div>"""
+    assert futbin.parse_price_html(html, "pc") == 48500
+
+
+def test_diagnostic_report(monkeypatch):
+    class Resp:
+        def __init__(self, url, text, status=200):
+            self.url, self.text, self.status_code = url, text, status
+
+    def fake_get(url, params=None, timeout=None):
+        if "playerPrices" in url:
+            return Resp(url, "Not found", 404)
+        return Resp(url, '<title>Joueur</title><div class="platform-pc-only"><div class="lowest-price-1">12,000</div></div>')
+    monkeypatch.setattr(futbin._session, "get", fake_get)
+    report = futbin.diagnostic(1)
+    assert "JSON : 404" in report and "Prix lu par l'application : 12000" in report
